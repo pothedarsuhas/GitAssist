@@ -156,3 +156,38 @@ class repos_owner_repo_git_refs(Resource):
         except GithubException as e:
             response_code = str(e) #gihub eception object is not subscriptable
             return {"branch name": target_branch, "creation_status": "failure", "exception" : str(e)}, response_code[:3]
+                
+class repos_owner_repo_merges(Resource):
+
+    def post(self, owner, repo):
+                           '''
+                           {
+              "username" : "pothedarsuhas",
+              "password" : "XXXXXXX",
+              "working_branch" : "targetbranchname"
+            }
+                           '''
+        parser = reqparse.RequestParser()
+        parser.add_argument("username", required=True)
+        parser.add_argument("password", required=True)
+        parser.add_argument("working_branch", required = True)
+        data = request.get_json()
+
+        username = data['username']
+        password = data['password']
+        working_branch = data['working_branch']
+        source_branch = "master"
+
+        try:
+            g = Github(username, password)
+            repoName = repo  # repo
+            repo = g.get_user().get_repo(repoName)
+            WORKING_BRANCH = working_branch
+            base = repo.get_branch(source_branch)
+            head = repo.get_branch(WORKING_BRANCH)
+            repo.merge("master", head.commit.sha, "merge to master")
+            return {"branch": working_branch, "merge_status": "success"}, 201
+
+        except GithubException as e:
+            response_code = str(e) #gihub eception object is not subscriptable
+            return {"branch": working_branch, "merge_status": "failure", "exception" : str(e)}, response_code[:3]
