@@ -32,3 +32,10 @@ g = Github("pothedarsuhas","XXXXXXXXXXXXx")
 # sb = repo.get_branch(source_branch)
 # repo.create_git_ref('refs/heads/' + target_branch, sb.commit.sha)
 # print(repo.get_git_ref('heads/master'))
+
+# repoName = "Jenkins" #repo
+# repo = g.get_user().get_repo(repoName)
+# WORKING_BRANCH = "MarioPuzo"
+# base = repo.get_branch("master")
+# head = repo.get_branch(WORKING_BRANCH)
+# merge_to_master = repo.merge("master", head.commit.sha, "merge to master")
