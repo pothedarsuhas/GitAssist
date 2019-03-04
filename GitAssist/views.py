@@ -123,4 +123,36 @@ class repos_owner_repo_branches(Resource):
             response_code = str(e) #gihub eception object is not subscriptable
             return {"message": "cant fetch branches", "exception" : str(e)}, response_code[:3]
 
-    def
+class repos_owner_repo_git_refs(Resource):
+
+    def post(self, owner, repo):
+        '''
+            create branches
+            sample request
+            {
+              "username" : "pothedarsuhas",
+              "password" : "XXXXXXXXXX",
+              "ref" : "targetbranchname"
+            }
+        '''
+        parser = reqparse.RequestParser()
+        parser.add_argument("username", required=True)
+        parser.add_argument("password", required=True)
+        parser.add_argument("ref", required=True)
+        data = request.get_json()
+
+        username = data['username']
+        password = data['password']
+        target_branch = data['ref']
+        source_branch = "master"
+
+        try:
+            g = Github(username, password)
+            repo = g.get_user().get_repo(repo)
+            sb = repo.get_branch(source_branch)
+            repo.create_git_ref('refs/heads/' + target_branch, sb.commit.sha)
+            return {"branch": target_branch, "creation_status": "success"}, 201
+
+        except GithubException as e:
+            response_code = str(e) #gihub eception object is not subscriptable
+            return {"branch name": target_branch, "creation_status": "failure", "exception" : str(e)}, response_code[:3]
