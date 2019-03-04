@@ -3,10 +3,10 @@ from github import *
 # First create a Github instance:
 
 # using username and password
-g = ()
+g = Github("pothedarsuhas","XXXXXXXXXXXXx")
 
 # or using an access token
-g = Github("36f8c6524c23908337c55ccb400c7cbeb5bb74b6")
+# g = Github("XXXXXXXXXXXXXXXXXXXXX")
 
 # Github Enterprise with custom hostname
 # g = Github(base_url="https://{hostname}/api/v3", login_or_token="access_token")
@@ -25,9 +25,10 @@ g = Github("36f8c6524c23908337c55ccb400c7cbeb5bb74b6")
 # print(a)
 
 
-repoName = "Jenkins"
-source_branch = 'master'
-target_branch = 'new branch'
-repo = g.get_user().get_repo(repoName)
-sb = repo.get_branch(source_branch)
-repo.create_git_ref(ref=target_branch, sha=sb.commit.sha)
+# repoName = "Jenkins" #repo
+# source_branch = 'master'
+# target_branch = 'newbranch' #ref
+# repo = g.get_user().get_repo(repoName)
+# sb = repo.get_branch(source_branch)
+# repo.create_git_ref('refs/heads/' + target_branch, sb.commit.sha)
+# print(repo.get_git_ref('heads/master'))
