@@ -15,7 +15,7 @@ app.config.from_pyfile('config.py')
 api.add_resource(user_repo, '/user/repos') #ceates a repository
 api.add_resource(repos_owner_repo, '/repos/<string:owner>/<string:repo>') #deletes a repository
 api.add_resource(repos_owner_repo_branches, '/repos/<string:owner>/<string:repo>/branches') #lists the branches in a repository
-
+api.add_resource(repos_owner_repo_git_refs, '/repos/<string:owner>/<string:repo>/git/refs') #creates branches in a repository
 
 #for organizations
 
