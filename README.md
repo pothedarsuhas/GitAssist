@@ -1,2 +1,1 @@
 # GitAssist
-just another repository
