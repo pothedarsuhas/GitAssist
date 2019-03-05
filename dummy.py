@@ -1,4 +1,9 @@
 from github import *
+import os
+# import git
+from flask import Flask
+import glob, hashlib
+
 
 # First create a Github instance:
 
@@ -43,12 +48,12 @@ g = Github("pothedarsuhas","XXXXXXXXXXXXx")
 
 from github import *
 from git import Repo
-import subprocess
+# import subprocess
 
 # First create a Github instance:
 
 # using username and password
-g = Github("pothedarsuhas","XXXXXXXXXXXXx")
+# g = Github("pothedarsuhas","XXXXXXXXXXXXx")
 
 # or using an access token
 # g = Github("XXXXXXXXXXXXXXXXXXXXX")
@@ -85,4 +90,11 @@ g = Github("pothedarsuhas","XXXXXXXXXXXXx")
 # branch = 'master'
 # Repo.clone_from(git_url, repo_dir,branch= branch)
 
+# import fnmatch # getting all files in directory
+# import os
+
+# matches = []
+# for root, dirnames, filenames in os.walk('C:/Users/1338826/PycharmProjects/IC2/Data-Structures-Algorithms'):
+#     for filename in fnmatch.filter(filenames, '*'):
+#         matches.append(os.path.join(root, filename).replace('\\','/'))
 
