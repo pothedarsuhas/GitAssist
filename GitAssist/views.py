@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource, Api, reqparse
 from github import *
-import json
+from git import *
 
 class user_repo(Resource):
 
@@ -65,7 +65,7 @@ class user_repo(Resource):
 
         except GithubException as e:
             response_code = str(e) #gihub eception object is not subscriptable
-            return {"repository name": name, "creation_status": "failed", "exception" : str(e)}, response_code[:3]
+            return {"repository name": name, "creation_status": "failure", "exception" : str(e)}, response_code[:3]
 
 class repos_owner_repo(Resource):
 
@@ -90,7 +90,7 @@ class repos_owner_repo(Resource):
 
         except GithubException as e:
             response_code = str(e) #gihub eception object is not subscriptable
-            return {"repository name": repo, "deletion_status": "failed", "exception" : str(e)}, response_code[:3]
+            return {"repository name": repo, "deletion_status": "failure", "exception" : str(e)}, response_code[:3]
 
 
 class repos_owner_repo_branches(Resource):
@@ -116,7 +116,7 @@ class repos_owner_repo_branches(Resource):
         try:
             g = Github(username, password)
             repo = g.get_repo(owner+'/'+repo)
-            branches = str(list(repo.get_branches())
+            branches = str(list(repo.get_branches()))
             return {"branches": branches}, 200
 
         except GithubException as e:
@@ -126,15 +126,6 @@ class repos_owner_repo_branches(Resource):
 class repos_owner_repo_git_refs(Resource):
 
     def post(self, owner, repo):
-        '''
-            create branches
-            sample request
-            {
-              "username" : "pothedarsuhas",
-              "password" : "XXXXXXXXXX",
-              "ref" : "targetbranchname"
-            }
-        '''
         parser = reqparse.RequestParser()
         parser.add_argument("username", required=True)
         parser.add_argument("password", required=True)
@@ -156,17 +147,17 @@ class repos_owner_repo_git_refs(Resource):
         except GithubException as e:
             response_code = str(e) #gihub eception object is not subscriptable
             return {"branch name": target_branch, "creation_status": "failure", "exception" : str(e)}, response_code[:3]
-                
+
 class repos_owner_repo_merges(Resource):
 
     def post(self, owner, repo):
-                           '''
+        '''
                            {
               "username" : "pothedarsuhas",
               "password" : "XXXXXXX",
               "working_branch" : "targetbranchname"
             }
-                           '''
+        '''
         parser = reqparse.RequestParser()
         parser.add_argument("username", required=True)
         parser.add_argument("password", required=True)
@@ -191,3 +182,33 @@ class repos_owner_repo_merges(Resource):
         except GithubException as e:
             response_code = str(e) #gihub eception object is not subscriptable
             return {"branch": working_branch, "merge_status": "failure", "exception" : str(e)}, response_code[:3]
+
+class repos_owner_repo_clones(Resource):
+
+    def post(self, owner, repo):
+        '''
+                           {
+              "branch" : "targetbranchname"
+            }
+        '''
+        parser = reqparse.RequestParser()
+        parser.add_argument("branch", required=True)
+        branch = 'master'
+        data = request.get_json()
+        if 'branch' not in data.keys():
+            pass
+        else:
+            branch = data['branch']
+        try:
+            repository = repo
+            git_url = "https://github.com/" + owner + '/' + repository + '.git'  # https://github.com/pothedarsuhas/Jenkins.git
+            repo_dir = "/Users/suhaspothedar/Downloads/" + repository + '-' + branch #hardcoded currently for ease of development
+            Repo.clone_from(git_url, repo_dir, branch=branch)
+            return {"repository": repo, "branch": branch, "clone_status": "success"}, 200
+        except GithubException  as e:
+            response_code = str(e) #gihub eception object is not subscriptable
+            return {"repository": repo, "branch": branch, "clone_status": "failure", "exception" : str(e)}, response_code[:3]
+        except GitError  as e:
+            return {"repository": repo, "branch": branch, "clone_status": "failure", "exception" : str(e)}, 404
+
+
