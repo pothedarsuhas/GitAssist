@@ -98,3 +98,12 @@ from git import Repo
 #     for filename in fnmatch.filter(filenames, '*'):
 #         matches.append(os.path.join(root, filename).replace('\\','/'))
 
+# print(matches)
+
+# repoName = 'Jenkins'
+# repo = Repo(repoName)
+# commit_message = 'new things getting added'
+# repo.index.add(matches)
+# repo.index.commit(commit_message)
+# origin = repo.remote('origin')
+# origin.push()
