@@ -1,7 +1,9 @@
+import github3
 from flask import request
 from flask_restful import Resource, Api, reqparse
 from github import *
-from git import *
+import os, fnmatch
+from github3 import login, repository
 
 class user_repo(Resource):
 
@@ -65,7 +67,7 @@ class user_repo(Resource):
 
         except GithubException as e:
             response_code = str(e) #gihub eception object is not subscriptable
-            return {"repository name": name, "creation_status": "failure", "exception" : str(e)}, response_code[:3]
+            return {"repository name": name, "creation_status": "failed", "exception" : str(e)}, response_code[:3]
 
 class repos_owner_repo(Resource):
 
@@ -90,14 +92,14 @@ class repos_owner_repo(Resource):
 
         except GithubException as e:
             response_code = str(e) #gihub eception object is not subscriptable
-            return {"repository name": repo, "deletion_status": "failure", "exception" : str(e)}, response_code[:3]
+            return {"repository name": repo, "deletion_status": "failed", "exception" : str(e)}, response_code[:3]
 
 
 class repos_owner_repo_branches(Resource):
 
     def get(self, owner, repo):
         '''
-            list repositories
+            list branches
             sample request
             {
               "username" : "pothedarsuhas",
@@ -126,6 +128,15 @@ class repos_owner_repo_branches(Resource):
 class repos_owner_repo_git_refs(Resource):
 
     def post(self, owner, repo):
+        '''
+            create branches
+            sample request
+            {
+              "username" : "pothedarsuhas",
+              "password" : "XXXXXXXXXX",
+              "ref" : "targetbranchname"
+            }
+        '''
         parser = reqparse.RequestParser()
         parser.add_argument("username", required=True)
         parser.add_argument("password", required=True)
@@ -151,13 +162,6 @@ class repos_owner_repo_git_refs(Resource):
 class repos_owner_repo_merges(Resource):
 
     def post(self, owner, repo):
-        '''
-                           {
-              "username" : "pothedarsuhas",
-              "password" : "XXXXXXX",
-              "working_branch" : "targetbranchname"
-            }
-        '''
         parser = reqparse.RequestParser()
         parser.add_argument("username", required=True)
         parser.add_argument("password", required=True)
@@ -210,5 +214,54 @@ class repos_owner_repo_clones(Resource):
             return {"repository": repo, "branch": branch, "clone_status": "failure", "exception" : str(e)}, response_code[:3]
         except GitError  as e:
             return {"repository": repo, "branch": branch, "clone_status": "failure", "exception" : str(e)}, 404
+
+class repos_owner_repo_contents(Resource):
+
+    def post(self, owner, repo):
+        '''
+            upload to specific branch
+            {
+        	"user" : "pothedarsuhas",
+        	"password" : "Suhaspb@19",
+            "branch" : "newbranch",
+            "path" : "C:/Users/1338826/PycharmProjects/IC2/Data-Structures-Algorithms"
+            }
+            '''
+        parser = reqparse.RequestParser()
+        parser.add_argument("username", required=True)
+        parser.add_argument("password", required=True)
+        parser.add_argument("ref", required=True)
+        data = request.get_json()
+
+        username = data['username']
+        password = data['password']
+        branch = data['branch']
+        path =  data['path']
+
+        try:
+            gh = github3.login(username, password)
+            matches = []
+            for root, dirnames, filenames in os.walk(path):
+                for filename in fnmatch.filter(filenames, '*'):
+                    matches.append(os.path.join(root, filename).replace('\\', '/'))
+            print(matches)
+            repository = gh.repository('pothedarsuhas', 'Jenkins')
+            for file_info in matches:
+                with open(file_info, 'rb') as fd:
+                    contents = fd.read()
+                repository.create_file(
+                    path=file_info,
+                    message='Start tracking {!r}'.format(file_info),
+                    content=contents,
+                    branch= branch
+                )
+            return {"branch name": branch, "upload_status": "success"}, 201
+
+        except github3.GitHubError as e:
+            response_code = str(e) #gihub3 eception object is not subscriptable
+            return {"branch name": branch, "upload_status": "failure", "exception" : str(e)}, response_code[:3]
+
+
+
 
 
